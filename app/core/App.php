@@ -22,6 +22,17 @@ class App
 
         $this->controller = new $this->controller;
 
+        // Middleware
+        if (property_exists($this->controller, 'middlewares') && is_array($this->controller->middlewares)) {
+            foreach ($this->controller->middlewares as $middleware) {
+                if (file_exists('../app/middlewares/' . $middleware . '.php')) {
+                    require_once '../app/middlewares/' . $middleware . '.php';
+                    $middlewareInstance = new $middleware();
+                    $middlewareInstance->handle();
+                }
+            }
+        }
+
         // Action
         if (isset($urlProcessed[1])) {
             if (method_exists($this->controller, $urlProcessed[1])) {
