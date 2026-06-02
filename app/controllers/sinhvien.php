@@ -14,7 +14,7 @@ class sinhvien extends Controller
             'students' => $students
         ];
 
-        $this->view('sinhvien/index', $data);
+        $this->view('sinhvien/index', $data, 'layoutmaster');
     }
 
     public function add()
@@ -69,7 +69,7 @@ class sinhvien extends Controller
             }
         }
 
-        $this->view('sinhvien/add', $data);
+        $this->view('sinhvien/add', $data, 'layoutmaster');
     }
 
     public function edit($id = null)
@@ -139,7 +139,7 @@ class sinhvien extends Controller
             }
         }
 
-        $this->view('sinhvien/edit', $data);
+        $this->view('sinhvien/edit', $data, 'layoutmaster');
     }
 
     public function delete($id = null)
