@@ -9,6 +9,6 @@ class dashboard extends Controller
         $data = [
             'username' => $_SESSION['username'] ?? 'User'
         ];
-        $this->view('dashboard/index', $data);
+        $this->view('dashboard/index', $data, 'layoutmaster');
     }
 }

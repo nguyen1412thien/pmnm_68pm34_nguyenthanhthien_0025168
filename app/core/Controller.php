@@ -11,10 +11,17 @@ class Controller
         return false;
     }
 
-    public function view($view, $data = [])
+    public function view($view, $data = [], $layout = '')
     {
         if (file_exists('../app/views/' . $view . '.php')) {
-            require_once '../app/views/' . $view . '.php';
+            if ($layout && file_exists('../app/views/layouts/' . $layout . '.php')) {
+                ob_start();
+                require_once '../app/views/' . $view . '.php';
+                $content = ob_get_clean();
+                require_once '../app/views/layouts/' . $layout . '.php';
+            } else {
+                require_once '../app/views/' . $view . '.php';
+            }
         }
     }
 }
