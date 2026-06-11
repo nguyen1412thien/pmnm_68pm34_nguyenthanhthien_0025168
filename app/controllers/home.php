@@ -4,6 +4,8 @@ class home extends Controller
 {
     public function index()
     {
-        echo "Home Controller";
+        $baseUrl = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/\\');
+        header('Location: ' . $baseUrl . '/login');
+        exit;
     }
 }
