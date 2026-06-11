@@ -62,11 +62,7 @@ class sinhvien extends Controller
 
             if (empty($data['errors'])) {
                 $sinhVienModel = $this->model('SinhVienModel');
-                // Check if masv already exists
-                $db = (new DB())->getConnection();
-                $stmt = $db->prepare("SELECT id FROM sinhvien WHERE masv = :masv");
-                $stmt->execute(['masv' => $masv]);
-                if ($stmt->fetch()) {
+                if ($sinhVienModel->existsMasv($masv)) {
                     $data['errors']['masv'] = 'Mã sinh viên này đã tồn tại';
                 } else {
                     $success = $sinhVienModel->create([
@@ -132,11 +128,7 @@ class sinhvien extends Controller
             }
 
             if (empty($data['errors'])) {
-                // Check if another student has the same masv
-                $db = (new DB())->getConnection();
-                $stmt = $db->prepare("SELECT id FROM sinhvien WHERE masv = :masv AND id != :id");
-                $stmt->execute(['masv' => $masv, 'id' => $id]);
-                if ($stmt->fetch()) {
+                if ($sinhVienModel->existsMasvExcept($masv, $id)) {
                     $data['errors']['masv'] = 'Mã sinh viên này đã tồn tại ở sinh viên khác';
                 } else {
                     $success = $sinhVienModel->update($id, [

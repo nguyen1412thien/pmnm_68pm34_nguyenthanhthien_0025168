@@ -23,6 +23,20 @@ class SinhVienModel
         return (int)($result['total'] ?? 0);
     }
 
+    public function existsMasv($masv)
+    {
+        $stmt = $this->db->prepare("SELECT id FROM sinhvien WHERE masv = :masv");
+        $stmt->execute(['masv' => $masv]);
+        return (bool)$stmt->fetch();
+    }
+
+    public function existsMasvExcept($masv, $id)
+    {
+        $stmt = $this->db->prepare("SELECT id FROM sinhvien WHERE masv = :masv AND id != :id");
+        $stmt->execute(['masv' => $masv, 'id' => $id]);
+        return (bool)$stmt->fetch();
+    }
+
     public function getPaged($limit, $offset)
     {
         $stmt = $this->db->prepare("SELECT * FROM sinhvien ORDER BY id DESC LIMIT :limit OFFSET :offset");

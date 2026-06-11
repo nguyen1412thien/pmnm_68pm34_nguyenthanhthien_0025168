@@ -8,4 +8,3 @@ require_once '../app/core/DB.php';
 require_once '../app/core/App.php';
 
 new App();
-echo "MVC PHP Project";
