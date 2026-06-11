@@ -36,7 +36,7 @@
                             <td style="font-weight: 500;"><?php echo htmlspecialchars($student['hoten']); ?></td>
                             <td>
                                 <?php 
-                                    $gender = trim($student['gioitinh']);
+                                    $gender = trim($student['gioitinh'] ?? '');
                                     if (strcasecmp($gender, 'Nam') === 0) {
                                         echo '<span class="badge badge-male">Nam</span>';
                                     } elseif (strcasecmp($gender, 'Nữ') === 0 || strcasecmp($gender, 'Nu') === 0) {
@@ -79,6 +79,59 @@
                     <?php endforeach; ?>
                 </tbody>
             </table>
+
+            <?php
+            $currentPage = $data['currentPage'] ?? 1;
+            $totalPages = $data['totalPages'] ?? 1;
+            $totalStudents = $data['totalStudents'] ?? 0;
+            $limit = $data['limit'] ?? 5;
+            $offset = ($currentPage - 1) * $limit;
+            ?>
+            <div class="pagination-container">
+                <div class="pagination-info">
+                    Hiển thị từ <?php echo ($totalStudents > 0) ? ($offset + 1) : 0; ?> đến <?php echo min($offset + $limit, $totalStudents); ?> trong số <?php echo $totalStudents; ?> sinh viên
+                </div>
+                <div class="pagination">
+                    <!-- Nút Trước -->
+                    <?php if ($currentPage > 1): ?>
+                        <a href="<?php echo $baseUrl; ?>/sinhvien/index/<?php echo $currentPage - 1; ?>" class="pagination-link">&laquo; Trước</a>
+                    <?php else: ?>
+                        <span class="pagination-link disabled">&laquo; Trước</span>
+                    <?php endif; ?>
+
+                    <!-- Các trang số -->
+                    <?php 
+                    $startPage = max(1, $currentPage - 2);
+                    $endPage = min($totalPages, $currentPage + 2);
+                    
+                    if ($startPage > 1) {
+                        echo '<a href="' . $baseUrl . '/sinhvien/index/1" class="pagination-link">1</a>';
+                        if ($startPage > 2) {
+                            echo '<span class="pagination-link disabled">...</span>';
+                        }
+                    }
+
+                    for ($i = $startPage; $i <= $endPage; $i++) {
+                        $activeClass = ($i === $currentPage) ? ' active' : '';
+                        echo '<a href="' . $baseUrl . '/sinhvien/index/' . $i . '" class="pagination-link' . $activeClass . '">' . $i . '</a>';
+                    }
+
+                    if ($endPage < $totalPages) {
+                        if ($endPage < $totalPages - 1) {
+                            echo '<span class="pagination-link disabled">...</span>';
+                        }
+                        echo '<a href="' . $baseUrl . '/sinhvien/index/' . $totalPages . '" class="pagination-link">' . $totalPages . '</a>';
+                    }
+                    ?>
+
+                    <!-- Nút Sau -->
+                    <?php if ($currentPage < $totalPages): ?>
+                        <a href="<?php echo $baseUrl; ?>/sinhvien/index/<?php echo $currentPage + 1; ?>" class="pagination-link">Sau &raquo;</a>
+                    <?php else: ?>
+                        <span class="pagination-link disabled">Sau &raquo;</span>
+                    <?php endif; ?>
+                </div>
+            </div>
         <?php endif; ?>
     </div>
 </div>

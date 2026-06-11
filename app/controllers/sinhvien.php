@@ -4,14 +4,34 @@ class sinhvien extends Controller
 {
     public $middlewares = ['AuthMiddleware'];
 
-    public function index()
+    public function index($page = 1)
     {
-        $sinhVienModel = $this->model('SinhVien');
-        $students = $sinhVienModel->getAll();
+        $page = (int)$page;
+        if ($page < 1) {
+            $page = 1;
+        }
+
+        $limit = 5;
+        $offset = ($page - 1) * $limit;
+
+        $sinhVienModel = $this->model('SinhVienModel');
+        $totalStudents = $sinhVienModel->countAll();
+        $totalPages = (int)ceil($totalStudents / $limit);
+
+        if ($page > $totalPages && $totalPages > 0) {
+            $page = $totalPages;
+            $offset = ($page - 1) * $limit;
+        }
+
+        $students = $sinhVienModel->getPaged($limit, $offset);
 
         $data = [
             'username' => $_SESSION['username'] ?? 'User',
-            'students' => $students
+            'students' => $students,
+            'currentPage' => $page,
+            'totalPages' => $totalPages,
+            'totalStudents' => $totalStudents,
+            'limit' => $limit
         ];
 
         $this->view('sinhvien/index', $data, 'layoutmaster');
@@ -41,7 +61,7 @@ class sinhvien extends Controller
             }
 
             if (empty($data['errors'])) {
-                $sinhVienModel = $this->model('SinhVien');
+                $sinhVienModel = $this->model('SinhVienModel');
                 // Check if masv already exists
                 $db = (new DB())->getConnection();
                 $stmt = $db->prepare("SELECT id FROM sinhvien WHERE masv = :masv");
@@ -80,7 +100,7 @@ class sinhvien extends Controller
             exit;
         }
 
-        $sinhVienModel = $this->model('SinhVien');
+        $sinhVienModel = $this->model('SinhVienModel');
         $student = $sinhVienModel->getById($id);
 
         if (!$student) {
@@ -145,7 +165,7 @@ class sinhvien extends Controller
     public function delete($id = null)
     {
         if ($id) {
-            $sinhVienModel = $this->model('SinhVien');
+            $sinhVienModel = $this->model('SinhVienModel');
             $sinhVienModel->delete($id);
         }
         $baseUrl = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/\\');

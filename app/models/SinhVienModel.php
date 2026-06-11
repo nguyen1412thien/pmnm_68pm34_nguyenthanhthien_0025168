@@ -1,6 +1,6 @@
 <?php
 
-class SinhVien
+class SinhVienModel
 {
     private $db;
 
@@ -13,6 +13,22 @@ class SinhVien
     public function getAll()
     {
         $stmt = $this->db->query("SELECT * FROM sinhvien ORDER BY id DESC");
+        return $stmt->fetchAll();
+    }
+
+    public function countAll()
+    {
+        $stmt = $this->db->query("SELECT COUNT(*) as total FROM sinhvien");
+        $result = $stmt->fetch();
+        return (int)($result['total'] ?? 0);
+    }
+
+    public function getPaged($limit, $offset)
+    {
+        $stmt = $this->db->prepare("SELECT * FROM sinhvien ORDER BY id DESC LIMIT :limit OFFSET :offset");
+        $stmt->bindValue(':limit', (int)$limit, PDO::PARAM_INT);
+        $stmt->bindValue(':offset', (int)$offset, PDO::PARAM_INT);
+        $stmt->execute();
         return $stmt->fetchAll();
     }
 
