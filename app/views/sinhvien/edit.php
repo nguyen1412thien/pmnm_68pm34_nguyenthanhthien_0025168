@@ -52,13 +52,33 @@
 
         <div class="form-row">
             <div class="form-group">
-                <label for="lop">Lớp</label>
+                <label for="lop">Lớp (Tên tự do)</label>
                 <input type="text" id="lop" name="lop" placeholder="VD: 68PM34" value="<?php echo htmlspecialchars($_POST['lop'] ?? $student['lop'] ?? ''); ?>">
             </div>
 
             <div class="form-group">
+                <label for="malop">Chọn Lớp Học (Mã Lớp)</label>
+                <select id="malop" name="malop">
+                    <option value="">-- Chọn Lớp --</option>
+                    <?php 
+                        $selectedClass = $_POST['malop'] ?? $student['malop'] ?? '';
+                    ?>
+                    <?php foreach ($data['classes'] as $cls): ?>
+                        <option value="<?php echo htmlspecialchars($cls['malop']); ?>" <?php echo $selectedClass === $cls['malop'] ? 'selected' : ''; ?>>
+                            <?php echo htmlspecialchars($cls['malop'] . ' - ' . $cls['tenlop']); ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
                 <label for="diemtb">Điểm Trung Bình</label>
                 <input type="number" id="diemtb" name="diemtb" step="0.01" min="0" max="10" placeholder="0.00 - 10.00" value="<?php echo htmlspecialchars($_POST['diemtb'] ?? $student['diemtb'] ?? ''); ?>">
+            </div>
+            <div class="form-group">
+                <!-- empty for layout grid alignment -->
             </div>
         </div>
 

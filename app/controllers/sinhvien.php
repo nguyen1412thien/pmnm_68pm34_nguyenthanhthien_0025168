@@ -14,8 +14,18 @@ class sinhvien extends Controller
         $limit = 5;
         $offset = ($page - 1) * $limit;
 
+        $keyword = trim($_GET['keyword'] ?? '');
+        $lop_filter = trim($_GET['lop_filter'] ?? '');
+
+        $search = [
+            'keyword' => $keyword,
+            'lop_filter' => $lop_filter
+        ];
+
         $sinhVienModel = $this->model('SinhVienModel');
-        $totalStudents = $sinhVienModel->countAll();
+        $lophocModel = $this->model('LophocModel');
+
+        $totalStudents = $sinhVienModel->countAll($search);
         $totalPages = (int)ceil($totalStudents / $limit);
 
         if ($page > $totalPages && $totalPages > 0) {
@@ -23,15 +33,19 @@ class sinhvien extends Controller
             $offset = ($page - 1) * $limit;
         }
 
-        $students = $sinhVienModel->getPaged($limit, $offset);
+        $students = $sinhVienModel->getPaged($limit, $offset, $search);
+        $classes = $lophocModel->getAll();
 
         $data = [
             'username' => $_SESSION['username'] ?? 'User',
             'students' => $students,
+            'classes' => $classes,
             'currentPage' => $page,
             'totalPages' => $totalPages,
             'totalStudents' => $totalStudents,
-            'limit' => $limit
+            'limit' => $limit,
+            'keyword' => $keyword,
+            'lop_filter' => $lop_filter
         ];
 
         $this->view('sinhvien/index', $data, 'layoutmaster');
@@ -39,8 +53,12 @@ class sinhvien extends Controller
 
     public function add()
     {
+        $lophocModel = $this->model('LophocModel');
+        $classes = $lophocModel->getAll();
+
         $data = [
             'username' => $_SESSION['username'] ?? 'User',
+            'classes' => $classes,
             'errors' => []
         ];
 
@@ -50,6 +68,7 @@ class sinhvien extends Controller
             $gioitinh = trim($_POST['gioitinh'] ?? '');
             $ngaysinh = trim($_POST['ngaysinh'] ?? '');
             $lop = trim($_POST['lop'] ?? '');
+            $malop = trim($_POST['malop'] ?? '');
             $diemtb = trim($_POST['diemtb'] ?? '');
 
             // Validation
@@ -71,6 +90,7 @@ class sinhvien extends Controller
                         'gioitinh' => $gioitinh ?: null,
                         'ngaysinh' => $ngaysinh ?: null,
                         'lop' => $lop ?: null,
+                        'malop' => $malop ?: null,
                         'diemtb' => $diemtb !== '' ? (float)$diemtb : null
                     ]);
 
@@ -105,9 +125,13 @@ class sinhvien extends Controller
             exit;
         }
 
+        $lophocModel = $this->model('LophocModel');
+        $classes = $lophocModel->getAll();
+
         $data = [
             'username' => $_SESSION['username'] ?? 'User',
             'student' => $student,
+            'classes' => $classes,
             'errors' => []
         ];
 
@@ -117,6 +141,7 @@ class sinhvien extends Controller
             $gioitinh = trim($_POST['gioitinh'] ?? '');
             $ngaysinh = trim($_POST['ngaysinh'] ?? '');
             $lop = trim($_POST['lop'] ?? '');
+            $malop = trim($_POST['malop'] ?? '');
             $diemtb = trim($_POST['diemtb'] ?? '');
 
             // Validation
@@ -137,6 +162,7 @@ class sinhvien extends Controller
                         'gioitinh' => $gioitinh ?: null,
                         'ngaysinh' => $ngaysinh ?: null,
                         'lop' => $lop ?: null,
+                        'malop' => $malop ?: null,
                         'diemtb' => $diemtb !== '' ? (float)$diemtb : null
                     ]);
 
