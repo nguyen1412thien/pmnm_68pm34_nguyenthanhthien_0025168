@@ -453,6 +453,85 @@
             cursor: not-allowed;
             pointer-events: none;
         }
+
+        /* Dashboard specific styles */
+        .welcome-section {
+            background: linear-gradient(135deg, #4f46e5 0%, #312e81 100%);
+            color: white;
+            padding: 2.5rem;
+            border-radius: 1rem;
+            margin-bottom: 2.5rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+        .welcome-section h2 {
+            margin: 0 0 0.5rem 0;
+            font-size: 1.875rem;
+            font-weight: 700;
+        }
+        .welcome-section p {
+            margin: 0;
+            color: #c7d2fe;
+            font-size: 1.05rem;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+        .grid a.card {
+            text-decoration: none;
+            display: flex;
+            flex-direction: column;
+            padding: 2rem;
+            transition: all 0.3s ease;
+        }
+        .grid a.card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            border-color: var(--primary);
+        }
+        .card-icon {
+            width: 3.5rem;
+            height: 3.5rem;
+            border-radius: 0.75rem;
+            background-color: #e0e7ff;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+        }
+        .card-icon svg {
+            width: 1.75rem;
+            height: 1.75rem;
+        }
+        .grid .card h3 {
+            margin: 0 0 0.75rem 0;
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+        .grid .card p {
+            margin: 0 0 1.5rem 0;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            line-height: 1.5;
+            flex-grow: 1;
+        }
+        .card-action {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+            color: var(--primary);
+            font-size: 0.9rem;
+        }
+        .card-action span {
+            transition: transform 0.2s ease;
+        }
+        .grid a.card:hover .card-action span {
+            transform: translateX(4px);
+        }
     </style>
 </head>
 <body>
@@ -462,6 +541,8 @@
         <div class="header-actions">
             <span class="user-info">Xin chào, <?php echo htmlspecialchars($data['username'] ?? 'User'); ?></span>
             <a href="<?php echo $baseUrl; ?>/dashboard" class="btn btn-secondary">Dashboard</a>
+            <a href="<?php echo $baseUrl; ?>/lophoc" class="btn btn-secondary">Quản lý Lớp</a>
+            <a href="<?php echo $baseUrl; ?>/sinhvien" class="btn btn-secondary">Quản lý SV</a>
             <a href="<?php echo $baseUrl; ?>/login/logout" class="btn btn-danger">Đăng xuất</a>
         </div>
     </header>
