@@ -7,14 +7,43 @@
         </a>
     </div>
 
+    <!-- Form tìm kiếm nâng cao -->
+    <div style="padding: 1.5rem 2rem; border-bottom: 1px solid var(--border); background-color: #fafafa;">
+        <form method="GET" action="<?php echo $baseUrl; ?>/sinhvien/index" style="display: flex; gap: 1rem; flex-wrap: wrap; align-items: flex-end;">
+            <div style="flex: 1; min-width: 250px;">
+                <label for="keyword" style="display: block; margin-bottom: 0.375rem; font-size: 0.85rem; font-weight: 600; color: var(--text-muted);">Tìm kiếm (MSSV, Họ Tên)</label>
+                <input type="text" id="keyword" name="keyword" placeholder="Nhập MSSV hoặc Họ tên..." value="<?php echo htmlspecialchars($data['keyword'] ?? ''); ?>" style="width: 100%; padding: 0.625rem 0.75rem; border: 1px solid var(--border); border-radius: 0.375rem; font-size: 0.9rem; box-sizing: border-box;">
+            </div>
+            <div style="width: 250px;">
+                <label for="lop_filter" style="display: block; margin-bottom: 0.375rem; font-size: 0.85rem; font-weight: 600; color: var(--text-muted);">Lọc theo Lớp</label>
+                <select id="lop_filter" name="lop_filter" style="width: 100%; padding: 0.625rem 0.75rem; border: 1px solid var(--border); border-radius: 0.375rem; font-size: 0.9rem; background-color: white; box-sizing: border-box;">
+                    <option value="">-- Tất cả các lớp --</option>
+                    <?php foreach ($data['classes'] as $cls): ?>
+                        <option value="<?php echo htmlspecialchars($cls['malop']); ?>" <?php echo (isset($data['lop_filter']) && $data['lop_filter'] === $cls['malop']) ? 'selected' : ''; ?>>
+                            <?php echo htmlspecialchars($cls['malop'] . ' - ' . $cls['tenlop']); ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <button type="submit" style="padding: 0.625rem 1.5rem; background-color: var(--primary); color: white; border: none; border-radius: 0.375rem; font-weight: 600; font-size: 0.9rem; cursor: pointer; transition: background-color 0.2s; height: 40px; display: inline-flex; align-items: center;">
+                Tìm kiếm
+            </button>
+            <?php if (!empty($data['keyword']) || !empty($data['lop_filter'])): ?>
+                <a href="<?php echo $baseUrl; ?>/sinhvien/index" style="padding: 0.625rem 1.5rem; background-color: #e2e8f0; color: var(--text-main); border: none; border-radius: 0.375rem; font-weight: 500; font-size: 0.9rem; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; height: 40px; box-sizing: border-box;">
+                    Xóa lọc
+                </a>
+            <?php endif; ?>
+        </form>
+    </div>
+
     <div class="table-responsive">
         <?php if (empty($data['students'])): ?>
             <div class="empty-state">
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
                 </svg>
-                <p>Chưa có sinh viên nào trong danh sách.</p>
-                <a href="<?php echo $baseUrl; ?>/sinhvien/add" class="btn btn-primary">+ Thêm sinh viên đầu tiên</a>
+                <p>Chưa có sinh viên nào khớp với điều kiện tìm kiếm.</p>
+                <a href="<?php echo $baseUrl; ?>/sinhvien/add" class="btn btn-primary">+ Thêm sinh viên mới</a>
             </div>
         <?php else: ?>
             <table>
@@ -25,6 +54,7 @@
                         <th>Giới Tính</th>
                         <th>Ngày Sinh</th>
                         <th>Lớp</th>
+                        <th>Mã Lớp</th>
                         <th>Điểm TB</th>
                         <th style="text-align: right;">Hành Động</th>
                     </tr>
@@ -51,9 +81,10 @@
                                     echo $student['ngaysinh'] 
                                         ? date('d/m/Y', strtotime($student['ngaysinh'])) 
                                         : '<span style="color: var(--text-muted)">-</span>'; 
-                                ?>
+                                    ?>
                             </td>
                             <td><?php echo htmlspecialchars($student['lop'] ?: '-'); ?></td>
+                            <td style="font-weight: 600; color: #475569;"><?php echo htmlspecialchars($student['malop'] ?: '-'); ?></td>
                             <td>
                                 <?php 
                                     if ($student['diemtb'] !== null) {
@@ -86,6 +117,16 @@
             $totalStudents = $data['totalStudents'] ?? 0;
             $limit = $data['limit'] ?? 5;
             $offset = ($currentPage - 1) * $limit;
+
+            // Xây dựng query string cho phân trang
+            $queryParams = [];
+            if (!empty($data['keyword'])) {
+                $queryParams['keyword'] = $data['keyword'];
+            }
+            if (!empty($data['lop_filter'])) {
+                $queryParams['lop_filter'] = $data['lop_filter'];
+            }
+            $queryString = !empty($queryParams) ? '?' . http_build_query($queryParams) : '';
             ?>
             <div class="pagination-container">
                 <div class="pagination-info">
@@ -94,7 +135,7 @@
                 <div class="pagination">
                     <!-- Nút Trước -->
                     <?php if ($currentPage > 1): ?>
-                        <a href="<?php echo $baseUrl; ?>/sinhvien/index/<?php echo $currentPage - 1; ?>" class="pagination-link">&laquo; Trước</a>
+                        <a href="<?php echo $baseUrl; ?>/sinhvien/index/<?php echo ($currentPage - 1) . $queryString; ?>" class="pagination-link">&laquo; Trước</a>
                     <?php else: ?>
                         <span class="pagination-link disabled">&laquo; Trước</span>
                     <?php endif; ?>
@@ -105,7 +146,7 @@
                     $endPage = min($totalPages, $currentPage + 2);
                     
                     if ($startPage > 1) {
-                        echo '<a href="' . $baseUrl . '/sinhvien/index/1" class="pagination-link">1</a>';
+                        echo '<a href="' . $baseUrl . '/sinhvien/index/1' . $queryString . '" class="pagination-link">1</a>';
                         if ($startPage > 2) {
                             echo '<span class="pagination-link disabled">...</span>';
                         }
@@ -113,20 +154,20 @@
 
                     for ($i = $startPage; $i <= $endPage; $i++) {
                         $activeClass = ($i === $currentPage) ? ' active' : '';
-                        echo '<a href="' . $baseUrl . '/sinhvien/index/' . $i . '" class="pagination-link' . $activeClass . '">' . $i . '</a>';
+                        echo '<a href="' . $baseUrl . '/sinhvien/index/' . $i . $queryString . '" class="pagination-link' . $activeClass . '">' . $i . '</a>';
                     }
 
                     if ($endPage < $totalPages) {
                         if ($endPage < $totalPages - 1) {
                             echo '<span class="pagination-link disabled">...</span>';
                         }
-                        echo '<a href="' . $baseUrl . '/sinhvien/index/' . $totalPages . '" class="pagination-link">' . $totalPages . '</a>';
+                        echo '<a href="' . $baseUrl . '/sinhvien/index/' . $totalPages . $queryString . '" class="pagination-link">' . $totalPages . '</a>';
                     }
                     ?>
 
                     <!-- Nút Sau -->
                     <?php if ($currentPage < $totalPages): ?>
-                        <a href="<?php echo $baseUrl; ?>/sinhvien/index/<?php echo $currentPage + 1; ?>" class="pagination-link">Sau &raquo;</a>
+                        <a href="<?php echo $baseUrl; ?>/sinhvien/index/<?php echo ($currentPage + 1) . $queryString; ?>" class="pagination-link">Sau &raquo;</a>
                     <?php else: ?>
                         <span class="pagination-link disabled">Sau &raquo;</span>
                     <?php endif; ?>
